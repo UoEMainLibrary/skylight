@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class content extends skylight {
 
-    function content() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

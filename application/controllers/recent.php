@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Recent extends skylight {
 
-    function Recent() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

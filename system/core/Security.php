@@ -475,8 +475,8 @@ class CI_Security {
 		}
 
 		// Numeric Entities
-		$str = preg_replace('~&#x(0*[0-9a-f]{2,5});{0,1}~ei', 'chr(hexdec("\\1"))', $str);
-		$str = preg_replace('~&#([0-9]{2,4});{0,1}~e', 'chr(\\1)', $str);
+		$str = preg_replace('~&#x(0*[0-9a-f]{2,5});?~ei', 'chr(hexdec("\\1"))', $str);
+		$str = preg_replace('~&#([0-9]{2,4});?~e', 'chr(\\1)', $str);
 
 		// Literal Entities - Slightly slow so we do another check
 		if (stristr($str, '&') === FALSE)
@@ -548,9 +548,7 @@ class CI_Security {
 	 *
 	 * Callback function for xss_clean() to remove whitespace from
 	 * things like j a v a s c r i p t
-	 *
-	 * @param	type
-	 * @return	type
+
 	 */
 	protected function _compact_exploded_words($matches)
 	{
@@ -690,7 +688,7 @@ class CI_Security {
 	{
 		$out = '';
 
-		if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches))
+		if (preg_match_all('#\s*[a-z\-]+\s*=\s*(["\'])([^\1]*?)\\1#is', $str, $matches))
 		{
 			foreach ($matches[0] as $match)
 			{

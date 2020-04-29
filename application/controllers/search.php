@@ -6,7 +6,7 @@ class Search extends skylight {
 
 
 
-    function Search() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

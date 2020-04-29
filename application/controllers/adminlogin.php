@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class AdminLogin extends skylight {
 
-    function AdminLogin() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }
