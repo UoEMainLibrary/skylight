@@ -64,8 +64,11 @@ $route['public-art/(:any)'] = "$1";
 $route['jlss/(:any)'] = "$1";
 $route['bodylanguage/(:any)'] = "$1";
 $route['eerc/(:any)'] = "$1";
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 293fb228225b2ce10dff375a2455d9f664ad4ca0
 $route['sitemap\.xml'] = "sitemap/sitemap";
 
 
