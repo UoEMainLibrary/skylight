@@ -93,8 +93,8 @@ class Solr_client_dspace_6 {
     }
 
     function solrEscape($in) {
-    	//SR - this "comment out" comes directly from v5 library.
-    	//Shows that an overall urldecode or encode is often not suitable.
+      //SR - this "comment out" comes directly from v5 library.
+      //Shows that an overall urldecode or encode is often not suitable.
         //$in = urldecode($in);
         $in = preg_replace('/#([^0-9])/',"$1",$in);
         $in = preg_replace('/\(/',"\\\(",$in);
@@ -189,8 +189,11 @@ class Solr_client_dspace_6 {
         return $data;
     }
 
-    function simpleSearch($q = '*:*', $offset = 1, $fq = array(), $operator = 'OR', $sort_by = 'score+desc', $rows = 0)
+    function simpleSearch($q = '*:*', $offset = 0, $fq = array(), $operator = 'OR', $sort_by = 'score+desc', $rows = 0)
     {
+        if (!is_numeric($offset)) {
+            $offset = 0;
+        }
 
         if($rows==0) {
             $rows = $this->rows;
@@ -262,7 +265,6 @@ class Solr_client_dspace_6 {
         $dates = $this->getDateRanges($this->date_field, $q, $fq);
         $ranges = $dates['ranges'];
         $datefqs = $dates['fq'];
-
         foreach($datefqs as $datefq) {
             // $url .= '&fq='.$datefq;
         }*/
@@ -332,6 +334,24 @@ class Solr_client_dspace_6 {
         //$solr_xml = file_get_contents($url_encoded);
 
         $search_xml = @new SimpleXMLElement($solr_xml);
+
+        $solr_response_status = $search_xml->xpath("//lst[@name='responseHeader']/int[@name='status']");
+
+        //If the curl or solr Http-request fails send an empty data object and provide an error message.
+        if ($http_code = curl_getinfo($con, CURLINFO_HTTP_CODE) != 200) {
+
+            $data['rows'] = 0;
+            $data['docs'] = array();
+            $data['facets'] = array();
+            error_log("Curl request isn't working. HTTP-Statuscode is: " . $http_code);
+            return $data;
+        } elseif ($solr_response_status[0] != 0) {
+            $data['rows'] = 0;
+            $data['docs'] = array();
+            $data['facets'] = array();
+            error_log("Solr request isn't working. HTTP-Statuscode is: " . $solr_response_status[0]);
+            return $data;
+        }
 
         $docs = array();
         $facet = array();
@@ -512,7 +532,6 @@ class Solr_client_dspace_6 {
         foreach($this->configured_date_filters as $filter_name => $filter) {
             array_push($ranges,$this->getDateRanges($filter));
         }
-
          */
         //SR - 15/12/2019 -more date range changes
         //New from here to...
@@ -729,7 +748,6 @@ class Solr_client_dspace_6 {
                 //echo $doc['handle'][0].': '.$highlight.'<br/>';
                 $solr['highlights'][] = $highlight;
             }
-
              */
         }
 
@@ -832,7 +850,6 @@ class Solr_client_dspace_6 {
             }
             /*
             SR 19/12/19 simplify- can go to a urlencode in this case
-
             $metadatavalue = preg_replace('/:/','',$metadatavalue,-1);
             $metadatavalue = preg_replace('/\[/','\\[',$metadatavalue,-1);
             $metadatavalue = preg_replace('/\]/','\\]',$metadatavalue,-1);
