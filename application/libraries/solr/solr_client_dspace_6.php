@@ -93,8 +93,8 @@ class Solr_client_dspace_6 {
     }
 
     function solrEscape($in) {
-        //SR - this "comment out" comes directly from v5 library.
-        //Shows that an overall urldecode or encode is often not suitable.
+       //SR - this "comment out" comes directly from v5 library.
+       //Shows that an overall urldecode or encode is often not suitable.
         //$in = urldecode($in);
         $in = preg_replace('/#([^0-9])/',"$1",$in);
         $in = preg_replace('/\(/',"\\\(",$in);
@@ -269,54 +269,54 @@ class Solr_client_dspace_6 {
             // $url .= '&fq='.$datefq;
         }*/
 
-        // Set up scope
+       // Set up scope
 
-        $url_item = urlencode($this->container);
-        $url .= '&fq='.$this->container_field.':'.$url_item;
-        $url .= '&fq=search.resourcetype:2';
-        $url .= '&sort='.$sort_by;
+       $url_item = urlencode($this->container);
+       $url .= '&fq='.$this->container_field.':'.$url_item;
+       $url .= '&fq=search.resourcetype:2';
+       $url .= '&sort='.$sort_by;
 
-        //Commented out in v5
-        //$url .= '&rows='.$this->rows.'&start='.$offset.'&facet.mincount=1';
-        //kshe085 - configurable rows for record searching thingy as per ian 2015-01-23
-
-
-        $url .= '&rows='.$rows.'&start='.$offset.'&facet.mincount=1';
-        $url .= '&facet=true&facet.limit='.$this->facet_limit;
-        foreach($this->configured_filters as $filter_name => $filter) {
-            $url .= '&facet.field='.$filter;
-        }
-
-        foreach($ranges as $range) {
-            $url .= '&facet.query='.$range;
-        }
-        $url .= '&q.op='.$operator;
-
-        //Set up highlighting
-        //SR CHANGE to get working (was causing encoding issues)- should reinstate <strong> aspect
-        //$url .= '&hl=true&hl.fl=*.en&hl.simple.pre=<strong>&hl.simple.post=</strong>';
-        $url .= '&hl=true&hl.fl=*.en&hl.simple.pre=&hl.simple.post=';
+       //Commented out in v5
+       //$url .= '&rows='.$this->rows.'&start='.$offset.'&facet.mincount=1';
+       //kshe085 - configurable rows for record searching thingy as per ian 2015-01-23
 
 
-        // Set up spellcheck
-        if($this->dictionary != '')
-        {
-            $url .= '&spellcheck=true&spellcheck.collate=true&spellcheck.onlyMorePopular=false&spellcheck.count=5';
-            $url .= '&spellcheck.dictionary=' . $this->dictionary;
-        }
-        else {
-            $url .= '&spellcheck=false';
-        }
+       $url .= '&rows='.$rows.'&start='.$offset.'&facet.mincount=1';
+       $url .= '&facet=true&facet.limit='.$this->facet_limit;
+       foreach($this->configured_filters as $filter_name => $filter) {
+           $url .= '&facet.field='.$filter;
+       }
 
-        //SR- 10/12/2019 - more decoding
-        $url = str_replace('+%7C%7C%7C+','%0A%7C%7C%7C%0A', $url);
-        $url = str_replace('+', '%20', $url);
+       foreach($ranges as $range) {
+           $url .= '&facet.query='.$range;
+       }
+       $url .= '&q.op='.$operator;
 
-        $url = str_replace('dc.date.issued.year:[0%20TO%200]', 'dc.date.issued.year:[0+TO+0]', $url);
+       //Set up highlighting
+       //SR CHANGE to get working (was causing encoding issues)- should reinstate <strong> aspect
+       //$url .= '&hl=true&hl.fl=*.en&hl.simple.pre=<strong>&hl.simple.post=</strong>';
+       $url .= '&hl=true&hl.fl=*.en&hl.simple.pre=&hl.simple.post=';
 
-        //function url_encode($string){
-        //   return urlencode(utf8_encode($string));
-        // }
+
+       // Set up spellcheck
+       if($this->dictionary != '')
+       {
+           $url .= '&spellcheck=true&spellcheck.collate=true&spellcheck.onlyMorePopular=false&spellcheck.count=5';
+           $url .= '&spellcheck.dictionary=' . $this->dictionary;
+       }
+       else {
+           $url .= '&spellcheck=false';
+       }
+
+       //SR- 10/12/2019 - more decoding
+       $url = str_replace('+%7C%7C%7C+','%0A%7C%7C%7C%0A', $url);
+       $url = str_replace('+', '%20', $url);
+
+       $url = str_replace('dc.date.issued.year:[0%20TO%200]', 'dc.date.issued.year:[0+TO+0]', $url);
+
+       //function url_encode($string){
+       //   return urlencode(utf8_encode($string));
+       // }
 
         $vars = '';
         $con = curl_init($url);
@@ -1111,7 +1111,7 @@ class Solr_client_dspace_6 {
         if(count($fq) > 0) {
             foreach($fq as $value)
                 $value = urlencode($value);
-            $url .= '&fq='.$this->solrEscape($value).'';
+                $url .= '&fq='.$this->solrEscape($value).'';
         }
         $url .= '&fq='.$this->container_field.':'.$this->container;
         $url .= '&fq=search.resourcetype:2&rows=1';
@@ -1134,7 +1134,7 @@ class Solr_client_dspace_6 {
         if(count($fq) > 0) {
             foreach($fq as $value)
                 $value = urlencode($value);
-            $url .= '&fq='.$this->solrEscape($value).'';
+                $url .= '&fq='.$this->solrEscape($value).'';
         }
         $url .= '&fq='.$this->container_field.':'.$this->container;
         $url .= '&fq=search.resourcetype:2&rows=1';
