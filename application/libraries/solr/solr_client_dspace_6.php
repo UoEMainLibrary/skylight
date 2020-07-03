@@ -93,8 +93,8 @@ class Solr_client_dspace_6 {
     }
 
     function solrEscape($in) {
-       //SR - this "comment out" comes directly from v5 library.
-       //Shows that an overall urldecode or encode is often not suitable.
+      //SR - this "comment out" comes directly from v5 library.
+      //Shows that an overall urldecode or encode is often not suitable.
         //$in = urldecode($in);
         $in = preg_replace('/#([^0-9])/',"$1",$in);
         $in = preg_replace('/\(/',"\\\(",$in);
