@@ -591,14 +591,10 @@ class Solr_client_dspace_6 {
         }
 */
 
-        $file = fopen("/home/lacddt/logging/log.txt","w");
-        echo fwrite($file,"'<!-- THIS IS MY URL'.$url.'-->'");
-        fclose($file);
-        print_r('<!-- THIS IS MY URL'.$url.'-->');
+
 
         $solr_xml = file_get_contents($url);
 
-        print_r('<!--THIS IS MY SOLR XML'.$solr_xml.'-->');
 
         // Base search URL
         $base_search = './search/'.$query;
