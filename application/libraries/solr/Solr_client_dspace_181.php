@@ -7,6 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
+
 class Solr_client_dspace_181
 {
 
@@ -415,7 +416,7 @@ class Solr_client_dspace_181
         {
             $ranges = array();
         }
-        
+
         $url .= '&fq=' . $this->container_field . ':' . $this->container;
         $url .= '&fq=search.resourcetype:2&rows=0&facet.mincount=1';
         $url .= '&facet=true&facet.limit=' . $this->facet_limit;

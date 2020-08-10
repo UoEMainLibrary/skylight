@@ -53,7 +53,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['404_override'] = '';*/
 
 
-$route['default_controller'] = 'welcome';
+$route['default_controller'] = 'content';
 $route['404_override'] = 'content';
 
 $route['art/(:any)'] = "$1";
