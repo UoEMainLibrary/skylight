@@ -7,7 +7,7 @@
          $active_terms = array();
 
          ?>
-        <h4><a href="./browse/<?php echo $facet['name']; ?>"><?php echo $facet['name'] ?></a></h4>
+        <h4><a href="./browse/<?php echo $facet['name']; ?>" title="<?php echo $facet['name'] ?>"><?php echo $facet['name'] ?></a></h4>
 
         <?php if(preg_match('/Date/',$base_search) && $facet['name'] == 'Date') {
             $fpattern =  '#\/'.$facet['name'].'.*\]#';
@@ -19,7 +19,7 @@
 
         <ul class="selected">
             <li>
-                Clear <?php echo $facet['name']; ?> filters <a class="deselect" href='<?php echo $fremove;?>'></a>
+                Clear <?php echo $facet['name']; ?> filters <a class="deselect" href='<?php echo $fremove;?>' title="<?php echo $facet['name'] ?>"></a>
             </li>
         </ul>
              
@@ -42,7 +42,7 @@
                $pattern =  '#\/'.rawurlencode($facet['name']).':%22'.preg_quote($term['name'],-1).'%22#';
                $remove = preg_replace($pattern,'',$base_search, -1);
             ?>
-            <li><?php echo $term['display_name'];?> (<?php echo $term['count']; ?>) <a class="deselect" href='<?php echo $remove;?>'></a></li>
+            <li><?php echo $term['display_name'];?> (<?php echo $term['count']; ?>) <a class="deselect" href='<?php echo $remove;?>' title="Remove <?php echo $term['display_name'] ?>"></a></li>
         <?php
             }
         ?> </ul> <?php
@@ -52,7 +52,7 @@
         <?php foreach($inactive_terms as $term) {
             ?>
                 <li>
-                    <a href='<?php echo $base_search; ?>/<?php echo $facet['name']; ?>:<?php echo '%22'.$term['name'].'%22' ?><?php echo $base_parameters ?>'><?php echo $term['display_name'];?> (<?php echo $term['count']; ?>)
+                    <a href='<?php echo $base_search; ?>/<?php echo $facet['name']; ?>:<?php echo '%22'.$term['name'].'%22' ?><?php echo $base_parameters ?>' title="<?php echo $facet['name'] ?>"><?php echo $term['display_name'];?> (<?php echo $term['count']; ?>)
                     </a>
                 </li>
             <?php
@@ -68,7 +68,7 @@
             if($term['count'] > 0) {
             ?>
             <li>
-                <a class="deselect" href='<?php echo $remove; ?>/<?php echo $facet['name']; ?>:<?php echo $term['name']; ?><?php if(isset($operator)) echo '?operator='.$operator; ?>'><?php echo $term['display_name'];?> (<?php echo $term['count']; ?>)
+                <a class="deselect" href='<?php echo $remove; ?>/<?php echo $facet['name']; ?>:<?php echo $term['name']; ?><?php if(isset($operator)) echo '?operator='.$operator; ?>' title="Remove <?php echo $term['display_name'] ?>"><?php echo $term['display_name'];?> (<?php echo $term['count']; ?>)
                 </a>
             </li>
             <?php
@@ -80,7 +80,7 @@
        <?php }
        else {
            if($numterms == $this->config->item('skylight_facet_limit')) { ?>
-           <li><a href="./browse/<?php echo $facet['name']; ?>">More ...</a></li>
+           <li><a href="./browse/<?php echo $facet['name']; ?>" title="More ...">More ...</a></li>
        <?php }
             } ?>
         </ul>
