@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('skylight.php');
+require_once('Skylight.php');
 
 class OAIPMH extends skylight {
 
@@ -53,25 +53,25 @@ class OAIPMH extends skylight {
         // Process the query
         switch ($verb) {
             case "GetRecord":
-                require_once('oaipmh/getrecord.php');
+                require_once('oaipmh/Getrecord.php');
                 break;
             case "Identify":
-                require_once('oaipmh/identify.php');
+                require_once('oaipmh/Identify.php');
                 break;
             case "ListIdentifiers":
-                require_once('oaipmh/listidentifiers.php');
+                require_once('oaipmh/Listidentifiers.php');
                 break;
             case "ListMetadataFormats":
-                require_once('oaipmh/listmetadataformats.php');
+                require_once('oaipmh/Listmetadataformats.php');
                 break;
             case "ListRecords":
-                require_once('oaipmh/listrecords.php');
+                require_once('oaipmh/Listrecords.php');
                 break;
             case "ListSets":
-                require_once('oaipmh/listsets.php');
+                require_once('oaipmh/Listsets.php');
                 break;
             default:
-                require_once('oaipmh/illegalverb.php');
+                require_once('oaipmh/Illegalverb.php');
                 break;
         }
     }

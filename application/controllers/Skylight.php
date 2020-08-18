@@ -15,19 +15,19 @@ class skylight extends CI_Controller {
         // Initalise the parent
         parent::__construct();
 
-        // See if there is a skylight.php in the default 'local' location
-        if (file_exists('../skylight-local/config/skylight.php')) {
-            $this->_load_config('../skylight-local/config/skylight.php');
+        // See if there is a Skylight.php in the default 'local' location
+        if (file_exists('../skylight-local/config/Skylight.php')) {
+            $this->_load_config('../skylight-local/config/Skylight.php');
         } else {
             // Load the normal skylight config
             $this->config->load('skylight');
         }
 
-        // Is there a skylight-local setup, and does it have a master skylight.php config?
+        // Is there a skylight-local setup, and does it have a master Skylight.php config?
         $local_path = $this->config->item('skylight_local_path');
         if (!empty($local_path)) {
-            if (file_exists($local_path . '/config/skylight.php')) {
-                $this->_load_config($local_path . '/config/skylight.php');
+            if (file_exists($local_path . '/config/Skylight.php')) {
+                $this->_load_config($local_path . '/config/Skylight.php');
             }
         }
 

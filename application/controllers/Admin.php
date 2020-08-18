@@ -1,6 +1,6 @@
 <?php
 
-require_once("skylight.php");
+require_once("Skylight.php");
 
 class Admin extends skylight {
 

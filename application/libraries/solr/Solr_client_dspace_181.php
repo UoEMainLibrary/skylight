@@ -204,7 +204,7 @@ class Solr_client_dspace_181
         }
 
         // Returns $data containing search results and facets
-        // See search.php controller for example of usage
+        // See Search.php controller for example of usage
 
         $title = $this->recorddisplay[0]; //changed to index
         if ($q == '*' || $q == '') {

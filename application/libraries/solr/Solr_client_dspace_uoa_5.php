@@ -6,7 +6,7 @@
  * Time: 3:54 PM
  * To change this template use File | Settings | File Templates.
  */
- 
+
 class Solr_client_dspace_uoa {
 
     var $base_url       = 'http://localhost:8983/solr';  // Base URL. Typically not overridden in construct params. Get from config.
@@ -28,19 +28,20 @@ class Solr_client_dspace_uoa {
     var $link_bitstream = false;
     var $dictionary = '';
     var $fields = array();
+    var $facet_limit = 10;
 
-   /**
-	 * Constructor
-	 *
-	 * @access	public
-	 * @param	array	initialization parameters
-	 */
-	public function __construct($params = array())
-	{
-		if (count($params) > 0)
-		{
-			$this->initialize($params);
-		}
+    /**
+     * Constructor
+     *
+     * @access	public
+     * @param	array	initialization parameters
+     */
+    public function __construct($params = array())
+    {
+        if (count($params) > 0)
+        {
+            $this->initialize($params);
+        }
 
         $CI =& get_instance();
         $this->base_url = $CI->config->item('skylight_solrbase');
@@ -56,36 +57,37 @@ class Solr_client_dspace_uoa {
         $this->thumbnail_field = str_replace('.','',$CI->config->item('skylight_thumbnail_field'));
         $this->dictionary = $CI->config->item('skylight_solr_dictionary');
         $this->fields = $CI->config->item('skylight_fields');
+        $this->facet_limit = $CI->config->item('skylight_facet_limit');
         $date_fields = $this->configured_date_filters;
         if(count($date_fields) > 0) {
             $this->date_field = array_pop($date_fields);
         }
 
-		log_message('debug', "skylight Solr Client Initialized");
-	}
+        log_message('debug', "skylight Solr Client Initialized");
+    }
 
-	// --------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
-	/**
-	 * Initialize Preferences
-	 *
-	 * @access	public
-	 * @param	array	initialization parameters
-	 * @return	void
-	 */
-	function initialize($params = array())
-	{
-		if (count($params) > 0)
-		{
-			foreach ($params as $key => $val)
-			{
-				if (isset($this->$key))
-				{
-					$this->$key = $val;
-				}
-			}
-		}
-	}
+    /**
+     * Initialize Preferences
+     *
+     * @access	public
+     * @param	array	initialization parameters
+     * @return	void
+     */
+    function initialize($params = array())
+    {
+        if (count($params) > 0)
+        {
+            foreach ($params as $key => $val)
+            {
+                if (isset($this->$key))
+                {
+                    $this->$key = $val;
+                }
+            }
+        }
+    }
 
     function solrEscape($in) {
         //$in = urldecode($in);
@@ -115,7 +117,7 @@ class Solr_client_dspace_uoa {
         $url = $this->base_url . "select?q=" . $this->solrEscape($q);
         if(count($fq) > 0) {
             foreach($fq as $value)
-            $url .= '&fq='.$this->solrEscape($value).'';
+                $url .= '&fq='.$this->solrEscape($value).'';
         }
 
         // Set up scope
@@ -124,7 +126,7 @@ class Solr_client_dspace_uoa {
 
         $url .= '&rows='.$rows;
 
-       // print_r($url);
+        // print_r($url);
 
         $solr_xml = file_get_contents($url);
         $search_xml = @new SimpleXMLElement($solr_xml);
@@ -137,15 +139,15 @@ class Solr_client_dspace_uoa {
             $doc = array();
             foreach($result->arr as $multivalue_field) {
                 $key = $multivalue_field['name'];
-                    foreach($multivalue_field->str as $value) {
-                        $doc[str_replace('.', '', $key)] = $value;
-                    }
-                    foreach($multivalue_field->int as $value) {
-                            $doc[str_replace('.', '', $key)] = $value;
-                        }
-                    foreach($multivalue_field->date as $value) {
-                            $doc[str_replace('.', '', $key)] = $value;
-                        }
+                foreach($multivalue_field->str as $value) {
+                    $doc[str_replace('.', '', $key)] = $value;
+                }
+                foreach($multivalue_field->int as $value) {
+                    $doc[str_replace('.', '', $key)] = $value;
+                }
+                foreach($multivalue_field->date as $value) {
+                    $doc[str_replace('.', '', $key)] = $value;
+                }
 
             }
 
@@ -187,13 +189,17 @@ class Solr_client_dspace_uoa {
         return $data;
     }
 
-    function simpleSearch($q = '*:*', $offset = 1, $fq = array(), $operator = 'OR', $sort_by = 'score+desc')
+    function simpleSearch($q = '*:*', $offset = 1, $fq = array(), $operator = 'OR', $sort_by = 'score+desc', $rows = 0)
     {
+
+        if($rows==0) {
+            $rows = $this->rows;
+        }
 
         $sort_by = str_replace(' ','+',$sort_by);
 
         // Returns $data containing search results and facets
-        // See search.php controller for example of usage
+        // See Search.php controller for example of usage
 
         $title = 'dctitle';
 
@@ -219,7 +225,7 @@ class Solr_client_dspace_uoa {
         $datefqs = $dates['fq'];
 
         foreach($datefqs as $datefq) {
-           // $url .= '&fq='.$datefq;
+            // $url .= '&fq='.$datefq;
         }
 
         // Set up scope
@@ -227,9 +233,10 @@ class Solr_client_dspace_uoa {
         $url .= '&fq=search.resourcetype:2';
         $url .= '&sort='.$sort_by;
 
-        $url .= '&rows='.$this->rows.'&start='.$offset.'&facet.mincount=1';
-        //$url .= '&rows=20&facet.mincount=1';
-        $url .= '&facet=true&facet.limit=10';
+//        $url .= '&rows='.$this->rows.'&start='.$offset.'&facet.mincount=1';
+        //kshe085 - configurable rows for record searching thingy as per ian 2015-01-23
+        $url .= '&rows='.$rows.'&start='.$offset.'&facet.mincount=1';
+        $url .= '&facet=true&facet.limit='.$this->facet_limit;
         foreach($this->configured_filters as $filter_name => $filter) {
             $url .= '&facet.field='.$filter;
         }
@@ -242,13 +249,13 @@ class Solr_client_dspace_uoa {
 
         // Set up highlighting
         $url .= '&hl=true&hl.fl=*.en&hl.simple.pre=<strong>&hl.simple.post=</strong>';
-		
-		
+
+
         // Set up spellcheck
         if($this->dictionary != '')
         {
-        $url .= '&spellcheck=true&spellcheck.collate=true&spellcheck.onlyMorePopular=false&spellcheck.count=5';
-        $url .= '&spellcheck.dictionary=' . $this->dictionary;
+            $url .= '&spellcheck=true&spellcheck.collate=true&spellcheck.onlyMorePopular=false&spellcheck.count=5';
+            $url .= '&spellcheck.dictionary=' . $this->dictionary;
         }
         else {
             $url .= '&spellcheck=false';
@@ -267,9 +274,12 @@ class Solr_client_dspace_uoa {
             $doc = array();
             foreach($result->arr as $multivalue_field) {
                 $key = $multivalue_field['name'];
-                    foreach($multivalue_field->str as $value) {
-                        $doc[str_replace('.', '', $key)][] = $value;
-                    }
+                foreach($multivalue_field->str as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
+                }
+                foreach($multivalue_field->int as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
+                }
 
             }
 
@@ -280,15 +290,24 @@ class Solr_client_dspace_uoa {
 
             }
 
+            // kshe085 why weren't we doing this for int too? 20150528
+            foreach($result->int as $unique_field) {
+                $key = $unique_field['name'];
+                $value = $unique_field;
+                $doc[str_replace('.', '', $key)]= $value;
+
+            }
+
+
             $raw_hdl = (string) $doc['handle'];
             $handle = preg_split('/\//',$raw_hdl);
 
             // Build highlight results from solr response
             if($search_xml->xpath("//lst[@name='highlighting']/lst" !== null)) {
-            foreach ($search_xml->xpath("//lst[@name='highlighting']/lst[@name='".$raw_hdl."']/arr/str") as $highlight) {
-                //echo $doc['handle'][0].': '.$highlight.'<br/>';
-                $doc['highlights'][] = $highlight;
-            }
+                foreach ($search_xml->xpath("//lst[@name='highlighting']/lst[@name='".$raw_hdl."']/arr/str") as $highlight) {
+                    //echo $doc['handle'][0].': '.$highlight.'<br/>';
+                    $doc['highlights'][] = $highlight;
+                }
             }
 
 
@@ -296,9 +315,11 @@ class Solr_client_dspace_uoa {
 
             $handle = preg_split('/\//',$raw_hdl);
             $doc['id'] = $handle[1];
+            /* kshe085 - temp removal of title force
             if(!array_key_exists($title,$doc)) {
                 $doc[$title][] = 'No title';
             }
+            kshe085 - end tem removal */
             $docs[] = $doc;
         }
 
@@ -327,23 +348,27 @@ class Solr_client_dspace_uoa {
             foreach ($facet_xml as $facet_term) {
 
 
-                    //$names = preg_split('/\|\|\|/',$facet_term->attributes());
+                //$names = preg_split('/\|\|\|/',$facet_term->attributes());
 
-                    $term['name'] = urlencode($facet_term->attributes());
-                    $term['name'] = preg_replace('/%2C/',',',$term['name']);
-                    $term['display_name'] = $facet_term->attributes();
-                    //$term['norm_name'] = urlencode($names[0]);
-                    $term['count'] = $facet_term;
-                    $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
+                $term['name'] = urlencode($facet_term->attributes());
+                $term['name'] = preg_replace('/%2C/',',',$term['name']);
+                $term['name'] = preg_replace('/%28/','&#40;',$term['name']);
+                $term['name'] = preg_replace('/%29/','&#41;',$term['name']);
+                $term['display_name'] = $facet_term->attributes();
+                //$term['norm_name'] = urlencode($names[0]);
+                $term['count'] = $facet_term;
+                $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
 
-                    if(in_array($active_test, $fq)) {
-                        $term['active'] = true;
-                    }
-                    else {
-                        $term['active'] = false;
-                    }
+                //print_r($term['name']);
+                //print_r($fq);
+                if(in_array($active_test, $fq)) {
+                    $term['active'] = true;
+                }
+                else {
+                    $term['active'] = false;
+                }
 
-                    $terms[] = $term;
+                $terms[] = $term;
             }
             $facet['terms'] = $terms;
             $facet['queries'] = array();
@@ -383,10 +408,10 @@ class Solr_client_dspace_uoa {
                 $query['count'] = $facet_query;
                 $active_test = $filter.$this->delimiter.$query_norm_name;
                 if(in_array($active_test, $fq)) {
-                        $query['active'] = true;
-                    }
-                    else {
-                        $query['active'] = false;
+                    $query['active'] = true;
+                }
+                else {
+                    $query['active'] = false;
                 }
 
                 $queries[] = $query;
@@ -413,7 +438,7 @@ class Solr_client_dspace_uoa {
         $url = $this->base_url . "select?q=" . $q;
         if(count($fq) > 0) {
             foreach($fq as $value)
-            $url .= '&fq='.$value.'';
+                $url .= '&fq='.$value.'';
         }
 
         /*
@@ -428,8 +453,8 @@ class Solr_client_dspace_uoa {
 
         $url .= '&fq='.$this->container_field.':'.$this->container;
         $url .= '&fq=search.resourcetype:2&rows=0&facet.mincount=1';
-        $url .= '&facet=true&facet.limit=10';
-        
+        $url .= '&facet=true&facet.limit='.$this->facet_limit;
+
         foreach($this->configured_filters as $filter_name => $filter) {
             $url .= '&facet.field='.$filter;
         }
@@ -463,26 +488,27 @@ class Solr_client_dspace_uoa {
             // Build facets from solr response
             foreach ($facet_xml as $facet_term) {
 
-                    //$names = preg_split('/\|\|\|/',$facet_term->attributes());
+                //$names = preg_split('/\|\|\|/',$facet_term->attributes());
 
-                    $term['name'] = urlencode($facet_term->attributes());
-                    $term['name'] = preg_replace('/%2C/',',',$term['name']);
-                    $term['display_name'] = $facet_term->attributes();
-                    $term['count'] = $facet_term;
-                    $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
+                //$term['name'] = urlencode($facet_term->attributes());
+                $term['name'] = $facet_term->attributes();
+                $term['name'] = preg_replace('/%2C/',',',$term['name']);
+                $term['display_name'] = $facet_term->attributes();
+                $term['count'] = $facet_term;
+                $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
 
-                    if(in_array($active_test, $saved_filters)) {
-                        $term['active'] = true;
-                    }
-                    else {
-                        $term['active'] = false;
-                    }
-
-                    $terms[] = $term;
+                if(in_array($active_test, $saved_filters)) {
+                    $term['active'] = true;
                 }
-                $facet['terms'] = $terms;
-                $facet['queries'] = array();
-                $facets[] = $facet;
+                else {
+                    $term['active'] = false;
+                }
+
+                $terms[] = $term;
+            }
+            $facet['terms'] = $terms;
+            $facet['queries'] = array();
+            $facets[] = $facet;
         }
 
         foreach($this->configured_date_filters as $filter_name => $filter) {
@@ -507,7 +533,7 @@ class Solr_client_dspace_uoa {
                             $query_display_name = preg_replace('#^.*\[(\d+) TO (\d+).*$#','\1 - \2',$query_name);
                         }
                         $query_norm_name = preg_replace('#^.*\[(\d+) TO (\d+).*$#','[\1%20TO%20\2]',$query_name);
-                        
+
                     }
                 }
                 //$query_display_name = preg_replace('#^.*\[(\d+) TO (\d+).*$#','\1 - \2',$query_name);
@@ -518,10 +544,10 @@ class Solr_client_dspace_uoa {
                 $fquery['count'] = $facet_query;
                 $active_test = $filter.$this->delimiter.$query_norm_name;
                 if(in_array($active_test, $fq)) {
-                        $fquery['active'] = true;
-                    }
-                    else {
-                        $fquery['active'] = false;
+                    $fquery['active'] = true;
+                }
+                else {
+                    $fquery['active'] = false;
                 }
                 $queries[] = $fquery;
             }
@@ -546,7 +572,7 @@ class Solr_client_dspace_uoa {
         // the below works but only with snippets, not in context
         // of the whole returned doc. Going with javascript now.
         //if($highlight == "") {
-            $url .= 'handle:' . $handle;
+        $url .= 'handle:' . $handle;
         //}
         //else {
         //    $url .= $highlight;
@@ -558,7 +584,7 @@ class Solr_client_dspace_uoa {
             $url .= '&hl=true&hl.fl=*.en';
         }*/
 
-      //  print_r($url);
+        //  print_r($url);
 
         $solr_xml = file_get_contents($url);
 
@@ -601,7 +627,7 @@ class Solr_client_dspace_uoa {
 
              */
         }
-        
+
         // Related Items
         if(array_key_exists($title_field, $solr) && array_key_exists($subject_field, $solr)) {
             $rels_xml = $this->getRelatedItems(array_merge($solr[$subject_field], $solr[$title_field]), $id);
@@ -622,15 +648,15 @@ class Solr_client_dspace_uoa {
             $doc = array();
             foreach($result->arr as $multivalue_field) {
                 $key = $multivalue_field['name'];
-                    foreach($multivalue_field->str as $value) {
-                        $doc[str_replace('.', '', $key)][] = $value;
-                    }
-                    foreach($multivalue_field->int as $value) {
-                        $doc[str_replace('.', '', $key)][] = $value;
-                    }
-                    foreach($multivalue_field->date as $value) {
-                        $doc[str_replace('.', '', $key)][] = $value;
-                    }
+                foreach($multivalue_field->str as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
+                }
+                foreach($multivalue_field->int as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
+                }
+                foreach($multivalue_field->date as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
+                }
             }
 
             foreach($result->str as $unique_field) {
@@ -674,7 +700,7 @@ class Solr_client_dspace_uoa {
         }
 
         return $data;
-        
+
     }
 
     function getRelatedItems($facets = array(), $id = '')
@@ -683,23 +709,23 @@ class Solr_client_dspace_uoa {
         $handle = $this->handle_prefix . '/' . $id;
         $counter = 0;
         $query_string = '';
-       foreach($facets as $metadatavalue) {
+        foreach($facets as $metadatavalue) {
             $metadatavalue = preg_replace('/:/','',-1);
-           $metadatavalue = preg_replace('/\[/','\\[',$metadatavalue,-1);
-           $metadatavalue = preg_replace('/\]/','\\]',$metadatavalue,-1);
-        //   $metadatavalue = preg_replace('/\(/','\\(',$metadatavalue,-1);
-        //   $metadatavalue = preg_replace('/\)/','\\)',$metadatavalue,-1);
-           $metadatavalue = preg_replace('/\+/','\\+',$metadatavalue,-1);
-           $metadatavalue = preg_replace('/\-/','\\-',$metadatavalue,-1);
+            $metadatavalue = preg_replace('/\[/','\\[',$metadatavalue,-1);
+            $metadatavalue = preg_replace('/\]/','\\]',$metadatavalue,-1);
+            //   $metadatavalue = preg_replace('/\(/','\\(',$metadatavalue,-1);
+            //   $metadatavalue = preg_replace('/\)/','\\)',$metadatavalue,-1);
+            $metadatavalue = preg_replace('/\+/','\\+',$metadatavalue,-1);
+            $metadatavalue = preg_replace('/\-/','\\-',$metadatavalue,-1);
 
-           if($counter == 0) {
+            if($counter == 0) {
                 $query_string .= $metadatavalue;
-           }
-           else {
+            }
+            else {
                 $query_string .= $operator . $metadatavalue;
-           }
-           $counter++;
-       }
+            }
+            $counter++;
+        }
         $query_string .= ' -handle:"'.$handle.'"';
         $url = $this->base_url . 'select?q='.$this->solrEscape($query_string);
         $url .= '&fq='.$this->container_field.':'.$this->container;
@@ -729,62 +755,62 @@ class Solr_client_dspace_uoa {
         $solr_xml = file_get_contents($url);
 
         $recent_xml = @new SimpleXMLElement($solr_xml);
-            $recent_items = array();
-            foreach ($recent_xml->result->doc as $result) {
-                $doc = array();
-                foreach($result->arr as $multivalue_field) {
-                    $key = $multivalue_field['name'];
-                        foreach($multivalue_field->str as $value) {
-                            $doc[str_replace('.', '', $key)][] = $value;
-                        }
-                        foreach($multivalue_field->int as $value) {
-                            $doc[str_replace('.', '', $key)][] = $value;
-                        }
-                        foreach($multivalue_field->date as $value) {
-                            $doc[str_replace('.', '', $key)][] = $value;
-                        }
+        $recent_items = array();
+        foreach ($recent_xml->result->doc as $result) {
+            $doc = array();
+            foreach($result->arr as $multivalue_field) {
+                $key = $multivalue_field['name'];
+                foreach($multivalue_field->str as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
                 }
-
-                foreach($result->str as $unique_field) {
-                    $key = $unique_field['name'];
-                    $value = $unique_field;
-                    $doc[str_replace('.', '', $key)]= $value;
+                foreach($multivalue_field->int as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
                 }
-
-                foreach($result->date as $unique_field) {
-                    $key = $unique_field['name'];
-                    $value = $unique_field;
-                    $doc[str_replace('.', '', $key)]= $value;
+                foreach($multivalue_field->date as $value) {
+                    $doc[str_replace('.', '', $key)][] = $value;
                 }
-
-                $raw_hdl = $doc['handle'] . ' ';
-
-                $handle = preg_split('/\//',$raw_hdl);
-                $doc['id'] = $handle[1];
-                if(!array_key_exists($title_field,$doc)) {
-                    $doc[$title_field][] = 'No title';
-                }
-
-                $recent_items[] = $doc;
             }
 
-            $data['title_field'] = $title_field;
-            $data['author_field'] = $author_field;
-            $data['description_field'] = $description_field;
-            if(isset($subject_field)) {
-                $data['subject_field'] = $subject_field;
+            foreach($result->str as $unique_field) {
+                $key = $unique_field['name'];
+                $value = $unique_field;
+                $doc[str_replace('.', '', $key)]= $value;
             }
 
-            $data['recent_items'] = $recent_items;
+            foreach($result->date as $unique_field) {
+                $key = $unique_field['name'];
+                $value = $unique_field;
+                $doc[str_replace('.', '', $key)]= $value;
+            }
+
+            $raw_hdl = $doc['handle'] . ' ';
+
+            $handle = preg_split('/\//',$raw_hdl);
+            $doc['id'] = $handle[1];
+            if(!array_key_exists($title_field,$doc)) {
+                $doc[$title_field][] = 'No title';
+            }
+
+            $recent_items[] = $doc;
+        }
+
+        $data['title_field'] = $title_field;
+        $data['author_field'] = $author_field;
+        $data['description_field'] = $description_field;
+        if(isset($subject_field)) {
+            $data['subject_field'] = $subject_field;
+        }
+
+        $data['recent_items'] = $recent_items;
 
         return $data;
     }
 
-    function browseTerms($field = 'Subject', $rows = 10, $offset = 0, $prefix = '') {
+    function browseTerms($field = 'Author', $rows = 10, $offset = 0, $prefix = '') {
 
         if( isset($this->configured_filters[$field]) ) {
             $facet_field = $this->configured_filters[$field];
-        } else {
+        } else if(isset($this->configured_date_filters[$field])) {
             $facet_field = $this->configured_date_filters[$field];
         }
 
@@ -799,7 +825,7 @@ class Solr_client_dspace_uoa {
         }
 
         $solr_xml = file_get_contents($url);
-        
+
         // Base search URL
         $base_search = './search/*';
 
@@ -817,13 +843,13 @@ class Solr_client_dspace_uoa {
         // Build facets from solr response
         foreach ($facet_xml as $facet_term) {
 
-                //$names = preg_split('/\|\|\|/',$facet_term->attributes());
+            //$names = preg_split('/\|\|\|/',$facet_term->attributes());
 
-                $term['name'] = urlencode($facet_term->attributes());
-                $term['display_name'] = $facet_term->attributes();
-                $term['count'] = $facet_term;
+            $term['name'] = urlencode($facet_term->attributes());
+            $term['display_name'] = $facet_term->attributes();
+            $term['count'] = $facet_term;
 
-                $terms[] = $term;
+            $terms[] = $term;
         }
 
         $facet['terms'] = $terms;
@@ -837,7 +863,7 @@ class Solr_client_dspace_uoa {
     function getDateRanges($field, $q, $fq) {
 
         $dates = array();
-        
+
         $lowest_year = $this->getLowerBound($field, $q, $fq);
         $lowest_year = floor($lowest_year / 10) * 10;
 
@@ -868,7 +894,7 @@ class Solr_client_dspace_uoa {
                 $ranges[] = $field.':['.$yr.'+TO+'.$yr.']';
             }
         }
-            rsort($ranges);
+        rsort($ranges);
 
         $dates['ranges'] = $ranges;
         $dates['fq'] = $fq;
@@ -884,7 +910,7 @@ class Solr_client_dspace_uoa {
         $url = $this->base_url . "select?q=" . $this->solrEscape($q);
         if(count($fq) > 0) {
             foreach($fq as $value)
-            $url .= '&fq='.$this->solrEscape($value).'';
+                $url .= '&fq='.$this->solrEscape($value).'';
         }
         $url .= '&fq='.$this->container_field.':'.$this->container;
         $url .= '&fq=search.resourcetype:2&rows=1';
@@ -906,7 +932,7 @@ class Solr_client_dspace_uoa {
         $url = $this->base_url . "select?q=" . $this->solrEscape($q);
         if(count($fq) > 0) {
             foreach($fq as $value)
-            $url .= '&fq='.$this->solrEscape($value).'';
+                $url .= '&fq='.$this->solrEscape($value).'';
         }
         $url .= '&fq='.$this->container_field.':'.$this->container;
         $url .= '&fq=search.resourcetype:2&rows=1';

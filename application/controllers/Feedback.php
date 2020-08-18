@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once('skylight.php');
+require_once('Skylight.php');
 require_once('./application/libraries/recaptcha-php-1.11/recaptchalib.php');
 
 class Feedback extends skylight {

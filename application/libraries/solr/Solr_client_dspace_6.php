@@ -202,7 +202,7 @@ class Solr_client_dspace_6 {
         $sort_by = str_replace(' ','+',$sort_by);
 
         // Returns $data containing search results and facets
-        // See search.php controller for example of usage
+        // See Search.php controller for example of usage
 
         $title = 'dctitle';
 

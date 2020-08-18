@@ -65,7 +65,7 @@ $config['skylight_share_buttons'] = false;
 // $config['skylight_homepage_recentitems'] = false;
 
 // Set to the number of minutes to cache pages for. Set to false for no caching.
-// This overrides the setting in skylight.php so is commented by Demo
+// This overrides the setting in Skylight.php so is commented by Demo
 $config['skylight_cache'] = false;
 
 // Digital object management
