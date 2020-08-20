@@ -9,7 +9,7 @@ class Advanced extends skylight {
 
 
 
-    function Advanced() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }
@@ -65,8 +65,8 @@ class Advanced extends skylight {
                    $encodedOptions = array();
 
                    if(is_array($options)) {
-                       foreach($options as $key => $value) {
-                           $encodedOptions[urlencode($key)] = $value;
+                       foreach($options as $nested_key => $nested_value) {
+                           $encodedOptions[urlencode($nested_key)] = $nested_value;
                        }
                    } else {
                        $encodedOptions = $options;

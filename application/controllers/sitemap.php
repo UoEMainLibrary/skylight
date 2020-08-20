@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Sitemap extends skylight {
 
-    function Sitemap() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

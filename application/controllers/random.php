@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Random extends skylight {
 
-    function Random() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

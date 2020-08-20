@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Feed extends skylight {
 
-    function Feed() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Timeline extends skylight {
 
-    function Timeline() {        // Initalise the parent
+    function __construct() {        // Initalise the parent
         parent::__construct();
     }
 

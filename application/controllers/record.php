@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Record extends skylight {
 
-    function Record() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

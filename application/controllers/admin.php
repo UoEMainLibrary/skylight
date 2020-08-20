@@ -4,7 +4,7 @@ require_once("skylight.php");
 
 class Admin extends skylight {
 
-    function Admin() {
+    function __construct() {
         // State that this is an authentication class
         skylight::_adminInterface();
 

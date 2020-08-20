@@ -5,7 +5,7 @@ require_once('./application/libraries/recaptcha-php-1.11/recaptchalib.php');
 
 class Feedback extends skylight {
 
-    function Feedback() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

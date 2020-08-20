@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Autocomplete extends skylight {
 
-    function Autocomplete() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

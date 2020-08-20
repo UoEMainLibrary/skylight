@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class HealthCheck extends skylight {
 
-    function HealthCheck() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

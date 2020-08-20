@@ -552,8 +552,6 @@ class CI_Loader {
 	 * If no path is provided, the most recently added path is removed.
 	 *
 	 * @access	public
-	 * @param	type
-	 * @return	type
 	 */
 	function remove_package_path($path = '', $remove_config_path = TRUE)
 	{

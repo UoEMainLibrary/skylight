@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class OAIPMH extends skylight {
 
-    function OAIPMH() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }
