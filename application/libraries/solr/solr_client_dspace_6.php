@@ -328,6 +328,8 @@ class Solr_client_dspace_6 {
 
         $solr_xml = curl_exec($con);
 
+        //log_message('debug', $url);
+
         //$solr_xml = file_get_contents($url);
 
         //$url_encoded = urlencode(utf8_encode($url));
@@ -441,7 +443,8 @@ class Solr_client_dspace_6 {
                 $term['name'] = preg_replace('/%2C/',',',$term['name']);
                 $term['name'] = preg_replace('/%28/','&#40;',$term['name']);
                 $term['name'] = preg_replace('/%29/','&#41;',$term['name']);
-                $term['display_name'] = $facet_term->attributes();
+                $term['display_name'] = preg_split('/\|\|\|/',$facet_term->attributes())[1];
+                //$term['display_name'] = $facet_term->attributes();
                 //$term['norm_name'] = urlencode($names[0]);
                 $term['count'] = $facet_term;
                 $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
@@ -582,6 +585,7 @@ class Solr_client_dspace_6 {
         */
 
         $solr_xml = file_get_contents($url);
+        log_message('debug', $url);
 
         // Base search URL
         $base_search = './search/'.$query;
@@ -610,7 +614,9 @@ class Solr_client_dspace_6 {
 
                 $term['name'] = $facet_term->attributes();
                 $term['name'] = preg_replace('/%2C/',',',$term['name']);
-                $term['display_name'] = $facet_term->attributes();
+
+                $term['display_name'] = preg_split('/\|\|\|/',$facet_term->attributes())[1];
+                //log_message('debug', preg_split('/\|\|\|/',$facet_term->attributes())[1]);
                 $term['count'] = $facet_term;
 
                 $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
@@ -1014,7 +1020,8 @@ class Solr_client_dspace_6 {
             //$names = preg_split('/\|\|\|/',$facet_term->attributes());
 
             $term['name'] = urlencode($facet_term->attributes());
-            $term['display_name'] = $facet_term->attributes();
+            //$term['display_name'] = $facet_term->attributes();
+            $term['display_name'] = preg_split('/\|\|\|/',$facet_term->attributes())[1];
             $term['count'] = $facet_term;
 
             $terms[] = $term;

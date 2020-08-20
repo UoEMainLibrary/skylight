@@ -55,6 +55,7 @@ $route['stcecilias/(:any)'] = "$1";
 $route['audio/(:any)'] = "$1";
 $route['towardsdolly/(:any)'] = "$1";
 $route['coimbra/(:any)'] = "$1";
+$route['coimbra-colls/(:any)'] = "$1";
 $route['lhsacasenotes/(:any)'] = "$1";
 $route['guardbook/(:any)'] = "$1";
 $route['archivemedia/(:any)'] = "$1";
