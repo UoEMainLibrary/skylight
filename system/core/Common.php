@@ -242,7 +242,6 @@
 			}
 		}
 
-
 		//SR May 19
 		//return $_config[0] =& $config;
 		$_config[0] =& $config;

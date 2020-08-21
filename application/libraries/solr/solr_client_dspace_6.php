@@ -576,7 +576,6 @@ class Solr_client_dspace_6 {
             // $url .= '&facet.query='.$range;
         }
 */
-
         //SR - some file logging as this cannot appear onscreen
         /*
         $file = fopen("/home/lacddt/logging/log.txt","w");
@@ -587,7 +586,6 @@ class Solr_client_dspace_6 {
 
         $solr_xml = file_get_contents($url);
         log_message('debug', $url);
-
 
         // Base search URL
         $base_search = './search/'.$query;
