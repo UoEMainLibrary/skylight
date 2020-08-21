@@ -18,7 +18,7 @@
 
     <li<?php if($index == 0) { echo ' class="first"'; } elseif($index == sizeof($related_items) - 1) { echo ' class="last"'; } ?>>
         <span class="small-icon <?php echo $type ?>"></span>
-        <a href="./record/<?php echo $doc['id']?>"><?php echo $doc[$title_field][0]; ?></a>
+        <a href="./record/<?php echo $doc['id']?>" title="<?php echo $doc[$title_field][0]; ?>"><?php echo $doc[$title_field][0]; ?></a>
         <div class="tags">
 
 
@@ -33,7 +33,7 @@
                // and recorddisplay key match and the delimiter is :
                $orig_filter = preg_replace('/ /','+',$author, -1);
                $orig_filter = preg_replace('/,/','%2C',$orig_filter, -1);
-               echo '<a href=\'./search/*/Author:"'.$orig_filter.'"\'>'.$author.'</a>';
+               echo '<a href=\'./search/*/Author:"'.$orig_filter.'"\' title="'.$author.'">'.$author.'</a>';
                 $num_authors++;
                 if($num_authors < sizeof($doc[$author_field])) {
                     echo ' ';

@@ -225,7 +225,9 @@ class Solr_client_dspace_exams
                $url .= '&fq=' . $this->solrEscape($value) . '';
         }
 
-        $url .= '&qf=dc.title^20.0';
+        // this is not a valid request to Solr
+        //$url .= '&qf=dc.title^20.0';
+        $url .= '&qf=dc.title';
 
         if (isset($this->date_field))
         {
@@ -259,7 +261,7 @@ class Solr_client_dspace_exams
 
         // Set up highlighting
         // SR 2/12/13 change *.en to $this->highlight_fields. Things like bitstream don't look good here!
-        $url .= '&hl=true&hl.fl='.$this->highlight_fields.'&hl.simple.pre=<strong>&hl.simple.post=</strong>';
+        $url .= '&hl=true&hl.fl='.$this->highlight_fields.'&hl.simple.pre=%3estrong%3e&hl.simple.post=%3e/strong%3e';
 
         // Set up spellcheck
 
@@ -267,7 +269,9 @@ class Solr_client_dspace_exams
         $url .= '&spellcheck.dictionary=' . $this->dictionary;
 
         // Call Solr!
-        $solr_xml = @file_get_contents($url);
+        $solr_xml = file_get_contents($url);
+
+        log_message('debug', $url);
         $search_xml = @new SimpleXMLElement($solr_xml);
 
         $docs = array();

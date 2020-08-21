@@ -55,14 +55,16 @@ $route['stcecilias/(:any)'] = "$1";
 $route['audio/(:any)'] = "$1";
 $route['towardsdolly/(:any)'] = "$1";
 $route['coimbra/(:any)'] = "$1";
+$route['coimbra-colls/(:any)'] = "$1";
 $route['lhsacasenotes/(:any)'] = "$1";
 $route['guardbook/(:any)'] = "$1";
 $route['archivemedia/(:any)'] = "$1";
 $route['speccoll/(:any)'] = "$1";
 $route['geddes/(:any)'] = "$1";
 $route['public-art/(:any)'] = "$1";
+$route['jlss/(:any)'] = "$1";
+$route['bodylanguage/(:any)'] = "$1";
 $route['eerc/(:any)'] = "$1";
-
 
 $route['sitemap\.xml'] = "sitemap/sitemap";
 
