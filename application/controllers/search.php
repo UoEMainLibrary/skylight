@@ -175,7 +175,10 @@ class Search extends skylight {
 
         $data['pagelinks'] = $this->pagination->create_links();
         $data['paginationlinks'] = $this->pagination->responsive_links();
-
+        //SL: workaround to fix pagination error going from page 2 to 1
+        if (!is_numeric($offset)) {
+            $offset = 0;
+        }
         $data['startrow'] = $offset + 1;
         if($data['startrow'] + ($rows - 1 )  > $result_count)
             $data['endrow'] = $result_count;
