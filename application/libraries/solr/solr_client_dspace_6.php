@@ -300,9 +300,10 @@ class Solr_client_dspace_6 {
         if($this->filter_sort == true){
             $url .= '&rows=' . $rows . '&start=' . $offset . '&facet.mincount=1';
             $url .= '&facet=true&facet.limit=' . $this->facet_limit;
+            $url .= '&facet.sort=index';
+
             foreach ($this->configured_filters as $filter_name => $filter) {
                 $url .= '&facet.field=' . $filter;
-                $url .= '&facet.sort=index' ;
             }
             foreach ($ranges as $range) {
                 $url .= '&facet.query=' . $range;
@@ -553,6 +554,9 @@ class Solr_client_dspace_6 {
             $q = '*:*';
         }
         $url = $this->base_url . "select?q=" . $q;
+        if($this->filter_sort == true){
+            $url .= '&facet.sort=index';
+        }
         //echo 'COUNT FQ'.count($fq);
         if(count($fq) > 0) {
             foreach($fq as $value)
