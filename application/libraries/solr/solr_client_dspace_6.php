@@ -30,6 +30,8 @@ class Solr_client_dspace_6 {
     var $dictionary = '';
     var $fields = array();
     var $facet_limit = 10;
+    var $filter_exact = false;
+    var $filter_sort = "";
 
 
     /**
@@ -61,6 +63,9 @@ class Solr_client_dspace_6 {
         $this->dictionary = $CI->config->item('skylight_solr_dictionary');
         $this->fields = $CI->config->item('skylight_fields');
         $this->facet_limit = $CI->config->item('skylight_facet_limit');
+        $this->filter_exact = $CI->config->item('skylight_filter_exact');
+        $this->filter_sort = $CI->config->item('skylight_filter_sort');
+
         $date_fields = $this->configured_date_filters;
         if(count($date_fields) > 0) {
             $this->date_field = array_pop($date_fields);
@@ -218,13 +223,24 @@ class Solr_client_dspace_6 {
         $url = $this->base_url . "select?q=" . $this->solrEscape($q);
 
 
-        if(count($fq) > 0) {
-            foreach($fq as $value) {
-                //SR 10/12/2019 change to append a * to filter- obviously this causes problems if there is a colon in the value
-                $value = str_replace(":",":*", $this->solrEscape($value));
-                $value = str_replace('\(', '%28', $value);
-                $value = str_replace('\)', '%29', $value);
-                $url .= '&fq='.$this->solrEscape($value).'*';
+        if(!isset($this->filter_exact) OR $this->filter_exact == false ) {
+            if (count($fq) > 0) {
+                foreach ($fq as $value) {
+                    //SR 10/12/2019 change to append a * to filter- obviously this causes problems if there is a colon in the value
+                    $value = str_replace(":", ":*", $this->solrEscape($value));
+                    $value = str_replace('\(', '%28', $value);
+                    $value = str_replace('\)', '%29', $value);
+                    $url .= '&fq=' . $this->solrEscape($value) . '*';
+                }
+            }
+        }
+        else{
+            if (count($fq) > 0) {
+                foreach ($fq as $value) {
+                    $value = str_replace('\(', '%28', $value);
+                    $value = str_replace('\)', '%29', $value);
+                    $url .= '&fq=' . $this->solrEscape($value);
+                }
             }
         }
 
@@ -281,15 +297,29 @@ class Solr_client_dspace_6 {
        //kshe085 - configurable rows for record searching thingy as per ian 2015-01-23
 
 
-       $url .= '&rows='.$rows.'&start='.$offset.'&facet.mincount=1';
-       $url .= '&facet=true&facet.limit='.$this->facet_limit;
-       foreach($this->configured_filters as $filter_name => $filter) {
-           $url .= '&facet.field='.$filter;
-       }
+        if($this->filter_sort == true){
+            $url .= '&rows=' . $rows . '&start=' . $offset . '&facet.mincount=1';
+            $url .= '&facet=true&facet.limit=' . $this->facet_limit;
+            $url .= '&facet.sort=index';
 
-       foreach($ranges as $range) {
-           $url .= '&facet.query='.$range;
-       }
+            foreach ($this->configured_filters as $filter_name => $filter) {
+                $url .= '&facet.field=' . $filter;
+            }
+            foreach ($ranges as $range) {
+                $url .= '&facet.query=' . $range;
+            }
+        }
+        else {
+            $url .= '&rows=' . $rows . '&start=' . $offset . '&facet.mincount=1';
+            $url .= '&facet=true&facet.limit=' . $this->facet_limit;
+            foreach ($this->configured_filters as $filter_name => $filter) {
+                $url .= '&facet.field=' . $filter;
+            }
+
+            foreach ($ranges as $range) {
+                $url .= '&facet.query=' . $range;
+            }
+        }
        $url .= '&q.op='.$operator;
 
        //Set up highlighting
@@ -524,6 +554,9 @@ class Solr_client_dspace_6 {
             $q = '*:*';
         }
         $url = $this->base_url . "select?q=" . $q;
+        if($this->filter_sort == true){
+            $url .= '&facet.sort=index';
+        }
         //echo 'COUNT FQ'.count($fq);
         if(count($fq) > 0) {
             foreach($fq as $value)
