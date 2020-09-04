@@ -222,7 +222,6 @@ class Solr_client_dspace_6 {
 
         $url = $this->base_url . "select?q=" . $this->solrEscape($q);
 
-
         if(!isset($this->filter_exact) OR $this->filter_exact == false ) {
             if (count($fq) > 0) {
                 foreach ($fq as $value) {
@@ -358,7 +357,6 @@ class Solr_client_dspace_6 {
 
         $solr_xml = curl_exec($con);
 
-        //log_message('debug', $url);
 
         //$solr_xml = file_get_contents($url);
 
@@ -463,27 +461,22 @@ class Solr_client_dspace_6 {
             $facet['name'] = $filter_name;
             $terms = array();
             $queries = array();
+
             // Build facets from solr response
             foreach ($facet_xml as $facet_term) {
+                $term['name'] = $facet_term->attributes();
 
-                //v5 change
-                //$names = preg_split('/\|\|\|/',$facet_term->attributes());
+                // HM 02-09-2020
+                // refactored to a public sanitiseFilter function
+                $term['name'] = self::sanitiseFilter($term['name']);
 
-                $term['name'] = urlencode($facet_term->attributes());
-                $term['name'] = preg_replace('/%2C/',',',$term['name']);
-                $term['name'] = preg_replace('/%28/','&#40;',$term['name']);
-                $term['name'] = preg_replace('/%29/','&#41;',$term['name']);
                 $term['display_name'] = preg_split('/\|\|\|/',$facet_term->attributes())[1];
                 //$term['display_name'] = $facet_term->attributes();
                 //$term['norm_name'] = urlencode($names[0]);
                 $term['count'] = $facet_term;
                 $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
 
-                if (in_array($active_test, $fq)) {
-                    $term['active'] = true;
-                } else {
-                    $term['active'] = false;
-                }
+                $term['active'] = in_array($active_test, $fq);
 
                 $terms[] = $term;
             }
@@ -546,6 +539,35 @@ class Solr_client_dspace_6 {
 
     }
 
+    // HM 02-09-2020
+    // Solr v. 4.10.4 (for DSpace 6) seems not to like
+    // spaces but rather pluses, in fact all URL sensitive characters
+    // are encoded but only those
+
+    // The reg exp replaces are the legacy method to sanitise
+    // using only urlencode seems to work 100% but the
+    // old method is left commented in case.
+
+    public static function sanitiseFilter($in) {
+        $in = urlencode($in);
+        /*$in = preg_replace('/&/', '%26', $in);
+        $in = preg_replace('/\?/', '%3F', $in);
+        $in = preg_replace('/"/', '%22', $in);
+        $in = preg_replace("/'/", '%27', $in);
+        $in = preg_replace("/ /", '+', $in);
+        $in = preg_replace("/\|/", '%7C', $in);
+        $in = preg_replace("/\//", '%2F', $in);
+
+        // Following three replaces are legacy and not confirmed as
+        // necessary
+        $in = preg_replace('/%2C/',',', $in);
+        $in = preg_replace('/%28/','&#40;', $in);
+        $in = preg_replace('/%29/','&#41;', $in);*/
+
+        return $in;
+
+    }
+
     function getFacets($q = '*:*', $fq = array(), $saved_filters = array())
     {
 
@@ -557,7 +579,7 @@ class Solr_client_dspace_6 {
         if($this->filter_sort == true){
             $url .= '&facet.sort=index';
         }
-        //echo 'COUNT FQ'.count($fq);
+
         if(count($fq) > 0) {
             foreach($fq as $value)
                 $url .= '&fq='.$value.'';
@@ -586,9 +608,6 @@ class Solr_client_dspace_6 {
             $ranges = array();
         }
 
-        //...Here.
-
-
         //SR- commenting this out and replacing with procedure above
         //$dates = $this->getDateRanges($this->date_field, $q, $fq);
         //$ranges = $dates['ranges'];
@@ -607,18 +626,9 @@ class Solr_client_dspace_6 {
         //SR commenting this out- it does not work with the v6 solr
         /*foreach($ranges as $range) {
             // $url .= '&facet.query='.$range;
-        }
-*/
-        //SR - some file logging as this cannot appear onscreen
-        /*
-        $file = fopen("/home/lacddt/logging/log.txt","w");
-        echo fwrite($file,"'<!-- THIS IS MY URL'.$url.'-->'");
-        fclose($file);
-        print_r('<!-- THIS IS MY URL'.$url.'-->');
-        */
+        } */
 
         $solr_xml = file_get_contents($url);
-        log_message('debug', $url);
 
         // Base search URL
         $base_search = './search/'.$query;
@@ -638,28 +648,23 @@ class Solr_client_dspace_6 {
             $facet_xml = $search_xml->xpath("//lst[@name='facet_fields']/lst[@name='".$filter."']/int");
             $facet['name'] = $filter_name;
             $terms = array();
+
             // Build facets from solr response
             foreach ($facet_xml as $facet_term) {
-                //v5 comments
-                //$names = preg_split('/\|\|\|/',$facet_term->attributes());
-
-                //$term['name'] = urlencode($facet_term->attributes());
-
                 $term['name'] = $facet_term->attributes();
-                $term['name'] = preg_replace('/%2C/',',',$term['name']);
+
+                // HM 02-09-2020
+                // refactored to a public sanitiseFilter function
+                $term['name'] = self::sanitiseFilter($term['name']);
 
                 $term['display_name'] = preg_split('/\|\|\|/',$facet_term->attributes())[1];
-                //log_message('debug', preg_split('/\|\|\|/',$facet_term->attributes())[1]);
+
                 $term['count'] = $facet_term;
 
-                $active_test = $filter.$this->delimiter.'%22'.$term['name'].'%22';
+                // getFilter is only called on index page and filters aren't active on index page
+                // for comparison look at simpleSearch
+                $term['active'] = false;
 
-                if(in_array($active_test, $saved_filters)) {
-                    $term['active'] = true;
-                }
-                else {
-                    $term['active'] = false;
-                }
                 $terms[] = $term;
             }
             $facet['terms'] = $terms;
