@@ -7,6 +7,25 @@
  * To change this template use File | Settings | File Templates.
  */
 
+
+/**
+ * Class Solr_client_dspace_6
+ *
+ *
+ * This class is intended to interrogate a Solr server running version 4.10.4
+ * running off a DSpace 6.3.
+ *
+ * This class needs extensive refactoring. It's not got date filtering capabilities.
+ * Peculiarly some methods are never called and getFacets is only called on the index page.
+ * If a filter is selected the search.php controller calls the simpleSearch function and obtains
+ * filters there.
+ *
+ * TODO:
+ *  * Complete refactor
+ *  * Use JSON
+ *
+ */
+
 class Solr_client_dspace_6 {
 
     var $base_url       = 'http://localhost:9136/solr';  // Base URL. Typically not overridden in construct params. Get from config.
