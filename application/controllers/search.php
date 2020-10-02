@@ -171,9 +171,14 @@ class Search extends skylight {
         $config['cur_tag_open'] = '&nbsp;<span class="curpage">';
         $config['cur_tag_close']= '</span>';
         $config['base_url'] = $base_search.$base_parameters;
+
         $this->pagination->initialize($config);
 
         $data['pagelinks'] = $this->pagination->create_links();
+
+        // Reset base_url between calling create_links and responsive_links
+        $this->pagination->base_url = $base_search.$base_parameters;
+
         $data['paginationlinks'] = $this->pagination->responsive_links();
         //SL: workaround to fix pagination error going from page 2 to 1
         if (!is_numeric($offset)) {

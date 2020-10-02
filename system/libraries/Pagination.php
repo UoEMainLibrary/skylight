@@ -408,7 +408,7 @@ class Pagination {
 				{
                     if ($this->cur_page == $loop)
 					{
-						$pages_array[] = '<li class="active"><span> '.$loop. '</span></li>'; // Current page
+						$pages_array[] = '<li class="active"><span>'.$loop. '</span></li>'; // Current page
 					}
 					else
 					{
