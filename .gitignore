@@ -2,3 +2,4 @@
 .DS_Store
 application/config/config-cklocal.php
 application/libraries/solr/solr_client_dspace_181-cklocal.php
+application/logs
