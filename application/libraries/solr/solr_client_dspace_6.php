@@ -1270,7 +1270,39 @@ class Solr_client_dspace_6 {
         return $value;
     }
 
-        // get ids of prev and next
+    // function to fetch an array of ids to be used
+    // by getNext and getPrev
+    function getItems($q, $container)
+    {
+        $url = $this->base_url . "select?indent=on&version=2.2&q=";
+        $url .= $q . "&fq=&start=0&rows=10000&fl=" . $container . "%2Chandle&qt=&wt=&explainOther=&hl.fl=f";
+
+        $solr_xml = file_get_contents($url);
+        $result_xml = @new SimpleXMLElement($solr_xml);
+
+        $ids = array();
+
+        foreach ($result_xml->result->doc as $result) {
+
+            foreach ($result->str as $unique_field) {
+                $key = $unique_field['name'];
+                $value = $unique_field;
+
+                //echo "Key: " . $key . " Value: " . $value . "</br>";
+
+                if($key = "handle") {
+                    $ids[] = preg_replace('/^.*\//', '',$value);
+                }
+
+            }
+
+        }
+
+        return $ids;
+
+    }
+
+    // get ids of prev and next
     function getNavigation($id, $q, $container)
     {
         $ids = $this->getItems($q, $container);
