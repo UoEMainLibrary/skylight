@@ -207,6 +207,10 @@ class solr_client_archivesspace_1
     function simpleSearch($q = '*:*', $offset = 1, $fq = array(), $operator = 'OR', $sort_by = 'score+desc')
     {
 
+        if (!is_numeric($offset)) {
+            $offset = 0;
+        }
+
         $sort_by = str_replace(' ', '+', $sort_by);
 
         // Returns $data containing search results and facets

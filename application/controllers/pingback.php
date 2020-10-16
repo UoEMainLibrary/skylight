@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Pingback extends skylight {
 
-    function Pingback() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }

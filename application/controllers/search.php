@@ -6,7 +6,7 @@ class Search extends skylight {
 
 
 
-    function Search() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }
@@ -171,11 +171,19 @@ class Search extends skylight {
         $config['cur_tag_open'] = '&nbsp;<span class="curpage">';
         $config['cur_tag_close']= '</span>';
         $config['base_url'] = $base_search.$base_parameters;
+
         $this->pagination->initialize($config);
 
         $data['pagelinks'] = $this->pagination->create_links();
-        $data['paginationlinks'] = $this->pagination->responsive_links();
 
+        // Reset base_url between calling create_links and responsive_links
+        $this->pagination->base_url = $base_search.$base_parameters;
+
+        $data['paginationlinks'] = $this->pagination->responsive_links();
+        //SL: workaround to fix pagination error going from page 2 to 1
+        if (!is_numeric($offset)) {
+            $offset = 0;
+        }
         $data['startrow'] = $offset + 1;
         if($data['startrow'] + ($rows - 1 )  > $result_count)
             $data['endrow'] = $result_count;

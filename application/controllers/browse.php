@@ -4,15 +4,15 @@ require_once('skylight.php');
 
 class Browse extends skylight {
 
-    function Browse() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }
 
     function _remap($field, $params = array()) {
-        if ((empty($field)) || ($field == 'index')) {
+        /*if ((empty($field)) || ($field == 'index')) {
 
-        }
+        }*/
 
         $configured_filters = $this->config->item('skylight_filters');
         $delimiter = $this->config->item('skylight_filter_delimiter');

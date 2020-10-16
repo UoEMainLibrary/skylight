@@ -11,7 +11,7 @@ class skylight extends CI_Controller {
     // The output type - normally html, but could be RDF / ATOM / JSON etc
     public $output_type = 'html';
 
-    function skylight() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
 
@@ -70,9 +70,9 @@ class skylight extends CI_Controller {
         $this->_load_languages();
 
         // Decide whether to enable caching, and if so, for how many minutes
-        if (is_numeric($this->config->item('skylight_cache'))) {
+        /*if (is_numeric($this->config->item('skylight_cache'))) {
             //$this->output->cache($this->config->item('skylight_cache'));
-        }
+        }*/
 
         // Load the solr library
         // Check for repo type and version, load accordingly
@@ -310,9 +310,9 @@ class skylight extends CI_Controller {
         if ((isset($_SESSION['skylight_language'])) &&
             ($this->config->item('skylight_language_default') != $_SESSION['skylight_language'])) {
             $this->_load_lang($_SESSION['skylight_language']);
-        } else {
+        }/* else {
             // TODO: Enable reading of browser locale
-        }
+        }*/
     }
 
     function _load_lang($lang_code) {

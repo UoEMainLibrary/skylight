@@ -4,7 +4,7 @@ require_once('skylight.php');
 
 class Record extends skylight {
 
-    function Record() {
+    function __construct() {
         // Initalise the parent
         parent::__construct();
     }
@@ -110,8 +110,11 @@ class Record extends skylight {
                 header('Content-MD5: ' . getBitstreamMD5($filearray, $seq));
                 header('Content-Length: ' . getBitstreamLength($filearray, $seq));
 
+                // Sebastian Lange 12.08.2020: Created a context object to give parameters to the readfile function which ignore the certificate
+                $ctx_opts = ['ssl' => ['verify_peer' => false, 'allow_self_signed' => true]];
+                $ctx = stream_context_create($ctx_opts);
                 // Stream the file
-                readfile($url);
+                readfile($url, false, $ctx);
 
                 // Go no further
                 die();
