@@ -67,6 +67,7 @@ $route['bodylanguage/(:any)'] = "$1";
 $route['eerc/(:any)'] = "$1";
 $route['umis/(:any)'] = "$1";
 $route['pointsofarrival/(:any)'] = "$1";
+$route['arch-dig/(:any)'] = "$1";
 $route['sitemap\.xml'] = "sitemap/sitemap";
 
 
