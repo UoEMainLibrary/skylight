@@ -51,6 +51,7 @@ $route['alumni/(:any)'] = "$1";
 $route['iconics/(:any)'] = "$1";
 $route['openbooks/(:any)'] = "$1";
 $route['anatomy/(:any)'] = "$1";
+$route['exhibitions/(:any)'] = "$1";
 $route['stcecilias/(:any)'] = "$1";
 $route['audio/(:any)'] = "$1";
 $route['towardsdolly/(:any)'] = "$1";
