@@ -65,6 +65,10 @@ class solr_client_archivesspace_1
             $this->date_field = array_pop($date_fields);
         }
 
+        // April 2021, Hrafn
+        // Differentiating between projects because I want different sorting without breaking stuff
+        $this->project = $CI->config->item('skylight_url_prefix');
+
         log_message('debug', "skylight Solr Client Initialized");
         log_message('debug', "handle_prefix " .$this->handle_prefix);
     }
@@ -262,7 +266,7 @@ class solr_client_archivesspace_1
             foreach ($fq as $value)
                 $url .= '&fq=' . $this->solrEscape($value) . '';
         }
-        if ($sort_by == null) {
+        if ($sort_by == null && $this->project != 'eerc' ) {
             $sort_by = "title_sort+asc";
         }
 
