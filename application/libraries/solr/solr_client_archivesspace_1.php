@@ -26,8 +26,10 @@ class solr_client_archivesspace_1
     var $link_bitstream = false;
     var $dictionary = 'default';
     var $fields = array(); //copied from uoa
-    var $solr_collection = "collection1"; //TODO move to config
+    var $solr_collection = "archivesspace"; //TODO move to config
+    $this->restriction =$CI->config->item('skylight_solr_core');
     var $restriction = array();
+
 
     /**
      * Constructor
