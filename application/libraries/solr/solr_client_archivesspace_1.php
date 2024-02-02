@@ -27,8 +27,8 @@ class solr_client_archivesspace_1
     var $dictionary = 'default';
     var $fields = array(); //copied from uoa
     //SR 2024-02-02- parameterise new config item for solr core when we understand the fix
-    //var $solr_collection = ''; //TODO move to config
-    var $solr_collection = 'collection1';
+    //var $solr_collection = 'collection1';
+    var $solr_collection = '';
     var $restriction = array();
 
 
@@ -46,7 +46,7 @@ class solr_client_archivesspace_1
 
         $CI =& get_instance();
         //SR 2024-02-02- parameterise new config item for solr core when we understand the fix
-        //$this->solr_collection = $CI->config->item('skylight_solr_core');
+        $this->solr_collection = $CI->config->item('skylight_solr_core');
         $this->base_url = $CI->config->item('skylight_solrbase');
         $this->handle_prefix = $CI->config->item('skylight_handle_prefix');
         $this->container = $CI->config->item('skylight_container_id');
