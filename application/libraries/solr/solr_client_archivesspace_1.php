@@ -293,7 +293,7 @@ class solr_client_archivesspace_1
         $url .= '&spellcheck=true&spellcheck.collate=true&spellcheck.onlyMorePopular=false&spellcheck.count=5';
         $url .= '&spellcheck.dictionary=' . $this->dictionary;
         $url .= '&wt=xml';
-        //print_r('simple search '. $url);
+
 
         $solr_xml = file_get_contents($url);
         $search_xml = @new SimpleXMLElement($solr_xml);
@@ -839,6 +839,7 @@ class solr_client_archivesspace_1
 
         $url .= '&df=fullrecord';
         $url .= '&rows=' . $this->num_related;
+        $url .= '&wt=xml';
         //print_r("related items url " . $url . " ");
 
         $solr_xml = file_get_contents($url);
