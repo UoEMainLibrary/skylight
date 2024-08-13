@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 if ($suggestion != NULL && $suggestion != "")
 {
    ?>
@@ -10,4 +10,4 @@ if ($suggestion != NULL && $suggestion != "")
 
 
    <?php
-}?>
+}?> -->
