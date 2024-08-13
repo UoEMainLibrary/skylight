@@ -24,7 +24,7 @@ $email_address = $this->config->item('skylight_adminemail');
     <p>
         If you have any questions, please contact: <a class="para-link" href="mailto:<?php echo $email_address ?>"><?php echo $email_address ?></a>
     </p>
-    <p><a class="para-link" href="https://www.ed.ac.uk/records-management/notice" target="_blank">University privacy statement</a></p>
+    <p><a class="para-link" href="https://www.ed.ac.uk/about/website/privacy" target="_blank">University privacy statement</a></p>
 
 
 </div>
