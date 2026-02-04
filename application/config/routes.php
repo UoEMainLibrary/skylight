@@ -41,6 +41,8 @@
 $route['default_controller'] = "content";
 $route['404_override'] = 'content';
 
+//$route['dp_proxy/(:any)/(:any)'] = 'dp_proxy/index/$1/$2';
+$route['dp_media/(:num)/(:any)'] = 'dp_proxy/index/$1/$2';
 $route['art/(:any)'] = "$1";
 $route['mimed/(:any)'] = "$1";
 $route['physics/(:any)'] = "$1";
