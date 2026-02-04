@@ -11,40 +11,57 @@ class Dp_proxy extends CI_Controller {
         }
 
         // Construct the source URL
-        $originalUrl = "https://digitalpreservation.is.ed.ac.uk/bitstream/handle/20.500.12734/$fileId/$fileName";
+        $url = "https://digitalpreservation.is.ed.ac.uk/bitstream/handle/20.500.12734/$fileId/$fileName";
         echo "Attempting to fetch: " . $originalUrl; // For debugging
- 
-        $ch = curl_init($originalUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_VERBOSE, true);
 
-        $response = curl_exec($ch);
+        $headers = [
+            'User-Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'Mozilla/5.0'),
+        ];
 
-        if (curl_errno($ch)) {
-            show_error('Error fetching file: ' . curl_error($ch), 500);
-            curl_close($ch);
-            return;
+        if (isset($_SERVER['HTTP_RANGE'])) {
+            $headers[] = 'Range: ' . $_SERVER['HTTP_RANGE'];
         }
 
-        if (!$response) {
-            show_404();
+        $context = stream_context_create([
+            'http' => [
+                'method'        => 'GET',
+                'header'        => implode("\r\n", $headers),
+                'ignore_errors' => true,
+            ],
+            'ssl' => [
+                'verify_peer'      => false,
+                'verify_peer_name' => false,
+            ],
+        ]);
+
+        // No output. Ever.
+        while (ob_get_level()) {
+            ob_end_clean();
         }
 
-        // Determine the content type from the cURL response
-        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        $fp = @fopen($url, 'rb', false, $context);
+        if (!$fp) {
+            http_response_code(404);
+            exit;
+        }
 
-        // Clean output buffer and send headers
-        ob_clean();
-        header("Content-Type: $contentType");
-        header("Content-Length: " . strlen($response));
-        flush();
-        echo $response;
+        // Forward upstream headers
+        $meta = stream_get_meta_data($fp);
 
-        curl_close($ch);
+        if (!empty($meta['wrapper_data'])) {
+            foreach ($meta['wrapper_data'] as $h) {
+                // Skip transfer-encoding to avoid double handling
+                if (stripos($h, 'Transfer-Encoding:') === 0) {
+                    continue;
+                }
+                header($h, false);
+            }
+        }
 
+        header('Accept-Ranges: bytes');
+
+        fpassthru($fp);
+        fclose($fp);
+        exit;
     }
 }
